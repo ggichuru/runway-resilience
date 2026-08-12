@@ -222,26 +222,36 @@ function approx(name, got, want, eps) {
 })();
 
 // --- 16. recommend ------------------------------------------------
-(function () {
-  var input = { income: 5000, expenses: 2000, savings: 6000 };
-  var recommendations = R.recommend(input);
-  
-  ok('recommend returns array', Array.isArray(recommendations));
-  ok('recommend returns at most 3 items', recommendations.length <= 3);
-  
-  // Check that all recommendations have the expected structure
-  recommendations.forEach(function(rec) {
-    ok('recommendation has action', typeof rec.action === 'string' && rec.action.length > 0);
-    ok('recommendation has deltaMonths', typeof rec.deltaMonths === 'number');
-    ok('deltaMonths is positive', rec.deltaMonths > 0);
-  });
-  
-  // Check ordering - should be sorted by deltaMonths descending
-  for (var i = 1; i < recommendations.length; i++) {
-    ok('recommendations ordered by deltaMonths descending', 
-       recommendations[i-1].deltaMonths >= recommendations[i].deltaMonths);
-  }
-})();
+  (function () {
+    var input = { income: 5000, expenses: 2000, savings: 6000 };
+    var recommendations = R.recommend(input);
+    
+    ok('recommend returns array', Array.isArray(recommendations));
+    ok('recommend returns at most 3 items', recommendations.length <= 3);
+    
+    // Check that all recommendations have the expected structure
+    recommendations.forEach(function(rec) {
+      ok('recommendation has action', typeof rec.action === 'string' && rec.action.length > 0);
+      ok('recommendation has deltaMonths', typeof rec.deltaMonths === 'number');
+      ok('deltaMonths is positive', rec.deltaMonths > 0);
+    });
+    
+    // Check ordering - should be sorted by deltaMonths descending
+    for (var i = 1; i < recommendations.length; i++) {
+      ok('recommendations ordered by deltaMonths descending', 
+         recommendations[i-1].deltaMonths >= recommendations[i].deltaMonths);
+    }
+    
+    // Additional test for the fix: should always return at least 3 actions for default input
+    var inputDefault = { income: 4000, expenses: 2500, savings: 6000 };
+    var recommendationsDefault = R.recommend(inputDefault);
+    ok('recommend returns 3 items for default input', recommendationsDefault.length === 3);
+    
+    // Check that all recommendations for default input have positive deltaMonths
+    recommendationsDefault.forEach(function(rec) {
+      ok('recommendation has positive deltaMonths for default input', rec.deltaMonths > 0);
+    });
+  })();
 
 console.log('ALL PASS (' + passed + ')');
 process.exit(0);
